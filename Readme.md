@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Tatya Maximenkо](https://up.htmlacademy.ru/javascript/17/user/905565).
-* Наставник: `Неизвестно`.
+* Наставник: [Илья Евсеев]] (https://htmlacademy.ru/profile/id494767).
 
 ---
 
