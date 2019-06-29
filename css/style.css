@@ -176,6 +176,7 @@ fieldset {
 
   border: 0;
   background: none;
+  transform: translate(-50%, -100%);
 }
 
 .map__pin:focus {
