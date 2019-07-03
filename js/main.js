@@ -1,16 +1,47 @@
 'use strict';
 
-var map = document.querySelector('.map');
-var mapPins = map.querySelector('.map__pins');
 var PinSize = {
   WIDTH: 50,
   HEIGHT: 70
 };
 
+var map = document.querySelector('.map');
+var adForm = document.querySelector('.ad-form');
+
+var mapPins = map.querySelector('.map__pins');
+var mapPinMain = document.querySelector('.map__pin--main');
+
+
+var enableAdForm = function () {
+  adForm.classList.remove('ad-form--disabled');
+
+  var fieldsets = adForm.querySelectorAll('fieldset');
+  for (var i = 0; i < fieldsets.length; i++) {
+    fieldsets[i].disabled = false;
+  }
+};
+
+var setAddressInputValue = function (value) {
+  var addressInput = document.getElementById('address');
+  addressInput.value = value;
+};
+
+var handleMainPinClick = function () {
+  map.classList.remove('map--faded');
+
+  // Делаем активной форму добавления метки
+  enableAdForm();
+
+  // Записываем координаты метки в поле "адрес"
+  var x = parseInt(mapPinMain.style.left, 10).toString();
+  var y = parseInt(mapPinMain.style.top, 10).toString();
+  setAddressInputValue(x + ', ' + y);
+};
+
+mapPinMain.addEventListener('click', handleMainPinClick);
+
 
 /* У блока .map уберем класс faded для перехода в активный режим */
-
-map.classList.remove('map--faded'); // временно
 
 
 /* Сгенерируем массив, состоящий из 8 объектов объявлений */
