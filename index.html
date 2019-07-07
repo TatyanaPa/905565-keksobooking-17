@@ -100,15 +100,15 @@
         </fieldset>
         <fieldset class="ad-form__element ad-form__element--wide" disabled>
           <label class="ad-form__label" for="title">Заголовок объявления</label>
-          <input id="title" name="title" type="text" placeholder="Милая, уютная квартирка в центре Токио">
+          <input id="title" name="title" type="text" placeholder="Милая, уютная квартирка в центре Токио" required>
         </fieldset>
         <fieldset class="ad-form__element ad-form__element--wide" disabled>
           <label class="ad-form__label" for="address">Адрес</label>
-          <input id="address" name="address" type="text">
+          <input id="address" name="address" type="text" required>
         </fieldset>
         <fieldset class="ad-form__element" disabled>
           <label class="ad-form__label" for="type">Тип жилья</label>
-          <select id="type" name="type">
+          <select id="type" name="type" required>
             <option value="bungalo">Бунгало</option>
             <option value="flat" selected>Квартира</option>
             <option value="house">Дом</option>
@@ -117,11 +117,11 @@
         </fieldset>
         <fieldset class="ad-form__element" disabled>
           <label class="ad-form__label" for="price">Цена за ночь, руб.</label>
-          <input id="price" name="price" type="number" placeholder="5000">
+          <input id="price" name="price" type="number" placeholder="5000" required>
         </fieldset>
         <fieldset class="ad-form__element ad-form__element--time" disabled>
           <label class="ad-form__label" for="timein">Время заезда и выезда</label>
-          <select id="timein" name="timein">
+          <select id="timein" name="timein" required>
             <option value="12:00" selected>После 12</option>
             <option value="13:00">После 13</option>
             <option value="14:00">После 14</option>
