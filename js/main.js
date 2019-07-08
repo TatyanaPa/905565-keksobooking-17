@@ -135,4 +135,48 @@ var handleMainPinClick = function () {
   setInputValue('address', x + ', ' + y);
 };
 
+var setSelectValue = function (select, value) {
+  var selOptions = select.options;
+  for (var i = 0; i < selOptions.length; i++) {
+    if (selOptions[i].value === value) {
+      selOptions[i].selected = true;
+      return;
+    }
+  }
+};
+
+var handleChangePropertyType = function (event) {
+  var minPricesPerNight = {
+    bungalo: 0,
+    flat: 1000,
+    house: 5000,
+    palace: 10000,
+  };
+
+  var offerType = event.target.value;
+  var currMinPricePerNight = minPricesPerNight[offerType];
+
+  var priceInput = document.getElementById('price');
+
+  if (currMinPricePerNight !== undefined) {
+    priceInput.min = currMinPricePerNight;
+    priceInput.placeholder = currMinPricePerNight;
+  }
+};
+
+var handleChangeTimeInTimeOut = function (event) {
+  var timeinSelect = adForm.querySelector('select[name=timein]');
+  var timeoutSelect = adForm.querySelector('select[name=timeout]');
+
+  setSelectValue(timeinSelect, event.target.value);
+  setSelectValue(timeoutSelect, event.target.value);
+};
+
+var typeSelect = adForm.querySelector('select[name=type]');
+typeSelect.addEventListener('change', handleChangePropertyType);
+
+
+var timeinSelect = adForm.querySelector('select[name=timein]');
+timeinSelect.addEventListener('change', handleChangeTimeInTimeOut);
+
 mapPinMain.addEventListener('click', handleMainPinClick);
