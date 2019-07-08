@@ -9,6 +9,16 @@ var map = document.querySelector('.map');
 var mapPins = map.querySelector('.map__pins');
 var mapPinMain = document.querySelector('.map__pin--main');
 var adForm = document.querySelector('.ad-form');
+var typeSelect = adForm.querySelector('select[name=type]');
+var timeinSelect = adForm.querySelector('select[name=timein]');
+
+var mainPinCoordinates = {
+  x: 0,
+  y: 0
+};
+
+var isMapActivated = false;
+var isMovingMainPin = false;
 
 var getRandomArrayItem = function (arr) {
   return arr[Math.round(Math.random() * (arr.length - 1))];
@@ -120,20 +130,99 @@ var setInputValue = function (inputId, value) {
 };
 
 // Обработчик нажатия на основную метку
-var handleMainPinClick = function () {
-  // Активируем карту и форму добавления объявления
-  setMapEnabled(true);
-  setAdFormEnabled(true);
+// var handleMainMapPinMouseDown = function (event) {
+//   if (!isMapActivated) {
+//     // Активируем карту и форму добавления объявления
+//     setMapEnabled(true);
+//     setAdFormEnabled(true);
 
-  // Генерируем и добавляем метки на карту
-  generateAndAppendMapPins();
+//     // Генерируем и добавляем метки на карту
+//     generateAndAppendMapPins();
 
-  // Записываем координаты метки в поле "адрес"
-  var x = parseInt(mapPinMain.style.left, 10).toString();
-  var y = parseInt(mapPinMain.style.top, 10).toString();
+//     // Считываем значения начальных координат метки
+//     mainPinCoordinates.x = parseInt(mapPinMain.style.left, 10).toString();
+//     mainPinCoordinates.y = parseInt(mapPinMain.style.top, 10).toString();
 
-  setInputValue('address', x + ', ' + y);
-};
+//     // Записываем координаты метки в поле "адрес"
+//     setInputValue('address', mainPinCoordinates.x + ', ' + mainPinCoordinates.y);
+
+//     isMapActivated = true;
+//   }
+
+//   sdrag(handleMainMapPinMouseMove, handleMainMapPinMouseUp);
+
+//   // isMovingMainPin = true;
+//   // map.addEventListener('mousemove', handleMainMapPinMouseMove, false);
+// };
+
+// var handleMainMapPinMouseMove = function (event) {
+
+//   // Считываем значения координат метки
+//   mainPinCoordinates.x = event.pageX;
+//   mainPinCoordinates.y = event.pageY;
+
+//   mapPinMain.style.left = mainPinCoordinates.x + "px";
+//   mapPinMain.style.top = mainPinCoordinates.y + "px";
+
+//   // Записываем координаты метки в поле "адрес"
+//   setInputValue('address', mainPinCoordinates.x + ', ' + mainPinCoordinates.y);
+
+//   // map.addEventListener("mouseup", handleMainMapPinMouseUp, false);
+// };
+
+// var handleMainMapPinMouseUp = function (event) {
+//   // document.removeEventListener("mousemove", handleMouseMove, false);
+//   // document.removeEventListener("mouseup", handleMainMapPinMouseUp, false);
+// };
+
+document.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var dragged = false;
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+    dragged = true;
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    mapPinMain.style.top = (mapPinMain.offsetTop - shift.y) + 'px';
+    mapPinMain.style.left = (mapPinMain.offsetLeft - shift.x) + 'px';
+
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+
+    if (dragged) {
+      var onClickPreventDefault = function (evt) {
+        evt.preventDefault();
+        mapPinMain.removeEventListener('click', onClickPreventDefault)
+      };
+      mapPinMain.addEventListener('click', onClickPreventDefault);
+    }
+
+  };
+
+  map.addEventListener('mousemove', onMouseMove);
+  map.addEventListener('mouseup', onMouseUp);
+});
 
 var setSelectValue = function (select, value) {
   var selOptions = select.options;
@@ -172,11 +261,9 @@ var handleChangeTimeInTimeOut = function (event) {
   setSelectValue(timeoutSelect, event.target.value);
 };
 
-var typeSelect = adForm.querySelector('select[name=type]');
+
 typeSelect.addEventListener('change', handleChangePropertyType);
-
-
-var timeinSelect = adForm.querySelector('select[name=timein]');
 timeinSelect.addEventListener('change', handleChangeTimeInTimeOut);
 
-mapPinMain.addEventListener('click', handleMainPinClick);
+mapPinMain.addEventListener('mousedown', handleMainMapPinMouseDown, false);
+// mapPinMain.addEventListener('mouseup', handleMainMapPinMouseUp);
