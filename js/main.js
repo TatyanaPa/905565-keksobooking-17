@@ -31,6 +31,8 @@ var getRandomInteger = function (min, max) {
   return Math.floor(min + Math.random() * (max + 1 - min));
 };
 
+var X = 10;
+
 // Возвращает путь изображения аватара
 var makeAvatarPathString = function (index) {
   var expandedIndex = index < 10 ? '0' + index : index;
@@ -179,8 +181,8 @@ var handleMouseDownMainPin = function (mouseDownEvent) {
     mainPinElement.style.top = mainPinElement.offsetTop - shift.y + 'px';
 
     setInputValue(
-        'address',
-        String(mainPinElement.offsetLeft - shift.x) + ', ' + String(mainPinElement.offsetTop - shift.y)
+      'address',
+      String(mainPinElement.offsetLeft - shift.x) + ', ' + String(mainPinElement.offsetTop - shift.y)
     );
   };
 
