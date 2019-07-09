@@ -179,8 +179,8 @@ var handleMouseDownMainPin = function (mouseDownEvent) {
     mainPinElement.style.top = mainPinElement.offsetTop - shift.y + 'px';
 
     setInputValue(
-        'address',
-        String(mainPinElement.offsetLeft - shift.x) + ', ' + String(mainPinElement.offsetTop - shift.y)
+      'address',
+      String(mainPinElement.offsetLeft - shift.x) + ', ' + String(mainPinElement.offsetTop - shift.y)
     );
   };
 
@@ -215,3 +215,4 @@ var handleChangeTimeIn = function (event) {
 mainPinElement.addEventListener('mousedown', handleMouseDownMainPin);
 typeSelectElement.addEventListener('change', handleChangePropertyType);
 timeinSelectElement.addEventListener('change', handleChangeTimeIn);
+// конец
