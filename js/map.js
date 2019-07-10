@@ -5,7 +5,22 @@
   var pinsElement = document.querySelector('.map__pins');
   var mainPinElement = document.querySelector('.map__pin--main');
 
+  var mapFilters = document.querySelector('.map__filters');
+  var housingTypeSelector = mapFilters.querySelector('select[name=housing-type]');
+
   var isMapActivated = false;
+
+  var announcements = [];
+  var announcementFilters = {
+    limit: 5,
+    type: 'any'
+  };
+
+  var handleChangeHousingTypeFilter = function (event) {
+    announcementFilters.type = event.target.value;
+    var filteredAnnouncements = applyFilters();
+    renderMapPins(filteredAnnouncements);
+  };
 
   // Активирует/деактивирует карту
   var setMapEnabled = function (enabled) {
@@ -16,12 +31,41 @@
     }
   };
 
+  var applyFilters = function () {
+    var filteredAnnouncements = announcements.slice();
+
+    // Фильтруем по типу жилья
+    if (announcementFilters.type !== 'any') {
+      filteredAnnouncements = filteredAnnouncements.filter(function (announcement) {
+        return announcement.offer.type === announcementFilters.type;
+      });
+    }
+
+    // Ограничиваем количество
+    if (announcementFilters.limit >= 0) {
+      filteredAnnouncements = filteredAnnouncements.slice(0, announcementFilters.limit);
+    }
+
+    return filteredAnnouncements;
+  };
+
+  var clearMapPins = function () {
+    var pins = pinsElement.querySelectorAll('.map__pin');
+    pins.forEach(function (pinElement) {
+      if (pinElement !== mainPinElement) {
+        pinsElement.removeChild(pinElement);
+      }
+    });
+  };
+
   // Генерирует и добавляет метки на карту
-  var renderMapPins = function (announcements) {
+  var renderMapPins = function (filteredAnnouncements) {
+    clearMapPins();
+
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < announcements.length; i++) {
-      var pin = window.createMapPinNode(announcements[i]);
+    for (var i = 0; i < filteredAnnouncements.length; i++) {
+      var pin = window.createMapPinNode(filteredAnnouncements[i]);
       fragment.appendChild(pin);
     }
 
@@ -31,7 +75,10 @@
   var loadAnnouncements = function () {
     window.loadAnnouncements(
         function (data) {
-          renderMapPins(data);
+          announcements = data;
+
+          var filteredAnnouncements = applyFilters();
+          renderMapPins(filteredAnnouncements);
         },
         function (error) {
           renderLoadAnnouncementsError(error);
@@ -112,4 +159,5 @@
   };
 
   mainPinElement.addEventListener('mousedown', handleMouseDownMainPin);
+  housingTypeSelector.addEventListener('change', handleChangeHousingTypeFilter);
 })();
