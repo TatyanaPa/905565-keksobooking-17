@@ -16,34 +16,44 @@
     }
   };
 
-  // Генерирует и возвращает массив случайных объявлений
-  var generateAnnouncements = function (count) {
-    var announcements = [];
-
-    for (var i = 0; i < count; i++) {
-      var x = window.getRandomInteger(window.PIN_SIZE.WIDTH, pinsElement.offsetWidth - window.PIN_SIZE.WIDTH);
-      var y = window.getRandomInteger(window.MIN_AVAILABLE_Y, window.MAX_AVAILABLE_Y - window.PIN_SIZE.HEIGHT);
-      var type = window.HOUSING_TYPES[window.getRandomInteger(0, window.HOUSING_TYPES.length - 1)];
-      var title = window.ANNOUNCEMENTS_TITLES[i];
-      var avatar = window.makeAvatarPathString(i + 1);
-
-      announcements.push(window.createAnnouncement(x, y, type, title, avatar));
-    }
-
-    return announcements;
-  };
-
   // Генерирует и добавляет метки на карту
-  var generateAndAppendMapPins = function (count) {
-    var announcements = generateAnnouncements(count);
+  var renderMapPins = function (announcements) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < count; i++) {
+    for (var i = 0; i < announcements.length; i++) {
       var pin = window.createMapPinNode(announcements[i]);
       fragment.appendChild(pin);
     }
 
     pinsElement.appendChild(fragment);
+  };
+
+  var loadAnnouncements = function () {
+    window.loadAnnouncements(
+        function (data) {
+          renderMapPins(data);
+        },
+        function (error) {
+          renderLoadAnnouncementsError(error);
+        }
+    );
+  };
+
+  var renderLoadAnnouncementsError = function (error) {
+    var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+    var errorElement = errorTemplate.cloneNode(true);
+    var errorElementText = errorElement.querySelector('.error__message');
+    var errorElementButton = errorElement.querySelector('.error__button');
+
+    errorElementText.innerText = error;
+
+    var mainElement = document.querySelector('main');
+    mainElement.appendChild(errorElement);
+
+    errorElementButton.addEventListener('click', function () {
+      mainElement.removeChild(errorElement);
+      loadAnnouncements();
+    });
   };
 
   var handleMouseDownMainPin = function (mouseDownEvent) {
@@ -53,8 +63,7 @@
       setMapEnabled(true);
       window.setAdFormEnabled(true);
 
-      var pinCount = window.ANNOUNCEMENTS_TITLES.length;
-      generateAndAppendMapPins(pinCount);
+      loadAnnouncements();
 
       var mainPinX = parseInt(mainPinElement.style.left, 10).toString();
       var mainPinY = parseInt(mainPinElement.style.top, 10).toString();

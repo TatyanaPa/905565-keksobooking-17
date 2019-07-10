@@ -22,4 +22,8 @@
     var expandedIndex = index < 10 ? '0' + index : index;
     return 'img/avatars/user' + expandedIndex + '.png';
   };
+
+  window.loadAnnouncements = function (onSuccess, onError) {
+    window.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
+  };
 })();

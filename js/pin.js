@@ -7,10 +7,10 @@
     var pinElement = pinTemplate.cloneNode(true);
     var pinElementCover = pinElement.querySelector('img');
 
-    pinElement.style.left = data.location.x;
-    pinElement.style.top = data.location.y;
+    pinElement.style.left = data.location.x + 'px';
+    pinElement.style.top = data.location.y + 'px';
     pinElementCover.src = data.author.avatar;
-    pinElementCover.alt = data.author.announcementTitle;
+    pinElementCover.alt = data.offer.title;
 
     return pinElement;
   };
