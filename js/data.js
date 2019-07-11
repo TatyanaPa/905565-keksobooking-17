@@ -27,3 +27,4 @@
     window.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
   };
 })();
+//конец
