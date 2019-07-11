@@ -26,5 +26,28 @@
   window.loadAnnouncements = function (onSuccess, onError) {
     window.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
   };
+
+  window.getPropertyNameByType = function (type) {
+    switch (type) {
+      case 'palace':
+        return 'Дворец';
+      case 'flat':
+        return 'Квартира';
+      case 'house':
+        return 'Дом';
+      case 'bungalo':
+        return 'Бунгало';
+      default:
+        return '';
+    }
+  };
+
+  window.getPropertyCapacity = function (rooms, guests) {
+    return rooms + ' комнаты для ' + guests + ' гостей';
+  };
+
+  window.getPropertyTimeInTimeOut = function (timein, timeout) {
+    return 'Заезд после ' + timein + ', выезд до ' + timeout;
+  };
 })();
-//конец
+// конец

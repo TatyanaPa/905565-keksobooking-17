@@ -58,9 +58,76 @@
     });
   };
 
+  var renderAnnouncementCard = function (announcement) {
+    var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
+    var cardElement = cardTemplate.cloneNode(true);
+
+    var author = announcement.author;
+    var offer = announcement.offer;
+
+    var cardAvatarElement = cardElement.querySelector('.popup__avatar');
+    cardAvatarElement.src = author.avatar;
+
+    var cardTitleElement = cardElement.querySelector('.popup__title');
+    cardTitleElement.innerText = offer.title;
+
+    var cardAddressElement = cardElement.querySelector('.popup__text--address');
+    cardAddressElement.innerText = offer.address;
+
+    var cardPriceElement = cardElement.querySelector('.popup__text--price');
+    cardPriceElement.innerText = offer.price + '₽/ночь';
+
+    var cardTypeElement = cardElement.querySelector('.popup__type');
+    cardTypeElement.innerText = window.getPropertyNameByType(offer.type);
+
+    var cardCapacityElement = cardElement.querySelector('.popup__text--capacity');
+    cardCapacityElement.innerText = window.getPropertyCapacity(offer.rooms, offer.guests);
+
+    var cardTimeInTimeOutElement = cardElement.querySelector('.popup__text--time');
+    cardTimeInTimeOutElement.innerText = window.getPropertyTimeInTimeOut(offer.checkin, offer.checkout);
+
+    var cardFeatureElements = cardElement.querySelectorAll('.popup__feature');
+    cardFeatureElements.forEach(function (featureElement) {
+      featureElement.style.display = 'none';
+      featureElement.classList.forEach(function (className) {
+        offer.features.forEach(function (featureName) {
+          if (className.endsWith(featureName)) {
+            featureElement.style.display = 'inline-block';
+          }
+        });
+      });
+    });
+
+    var cardPhotos = cardElement.querySelector('.popup__photos');
+
+    while (cardPhotos.hasChildNodes()) {
+      cardPhotos.removeChild(cardPhotos.lastChild);
+    }
+
+    for (var i = 0; i < offer.photos.length; i++) {
+      var cardPhoto = document.createElement('img');
+      cardPhoto.classList.add('popup__photo');
+      cardPhoto.width = 45;
+      cardPhoto.height = 40;
+      cardPhoto.src = offer.photos[i];
+      cardPhoto.alt = offer.title;
+
+      cardPhotos.appendChild(cardPhoto);
+    }
+
+    var cardDescriptionElement = cardElement.querySelector('.popup__description');
+    cardDescriptionElement.innerText = offer.description;
+
+    mapElement.appendChild(cardElement);
+  };
+
   // Генерирует и добавляет метки на карту
   var renderMapPins = function (filteredAnnouncements) {
     clearMapPins();
+
+    if (filteredAnnouncements && filteredAnnouncements.length > 0) {
+      renderAnnouncementCard(filteredAnnouncements[0]);
+    }
 
     var fragment = document.createDocumentFragment();
 
