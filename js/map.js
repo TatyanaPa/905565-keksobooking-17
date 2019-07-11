@@ -141,15 +141,15 @@
 
   var loadAnnouncements = function () {
     window.loadAnnouncements(
-        function (data) {
-          announcements = data;
+      function (data) {
+        announcements = data;
 
-          var filteredAnnouncements = applyFilters();
-          renderMapPins(filteredAnnouncements);
-        },
-        function (error) {
-          renderLoadAnnouncementsError(error);
-        }
+        var filteredAnnouncements = applyFilters();
+        renderMapPins(filteredAnnouncements);
+      },
+      function (error) {
+        renderLoadAnnouncementsError(error);
+      }
     );
   };
 
@@ -209,8 +209,8 @@
       mainPinElement.style.top = mainPinElement.offsetTop - shift.y + 'px';
 
       window.setInputValue(
-          'address',
-          String(mainPinElement.offsetLeft - shift.x) + ', ' + String(mainPinElement.offsetTop - shift.y)
+        'address',
+        String(mainPinElement.offsetLeft - shift.x) + ', ' + String(mainPinElement.offsetTop - shift.y)
       );
     };
 
@@ -228,3 +228,4 @@
   mainPinElement.addEventListener('mousedown', handleMouseDownMainPin);
   housingTypeSelector.addEventListener('change', handleChangeHousingTypeFilter);
 })();
+// конец
