@@ -9,8 +9,12 @@
   };
 
   var adFormElement = document.querySelector('.ad-form');
-  var typeSelectElement = adFormElement.querySelector('select[name=type]');
-  var timeinSelectElement = adFormElement.querySelector('select[name=timein]');
+
+  var propertyTypeSelect = adFormElement.querySelector('select[name=type]');
+  var timeinSelect = adFormElement.querySelector('select[name=timein]');
+  var timeoutSelect = adFormElement.querySelector('select[name=timeout]');
+  var roomsSelect = adFormElement.querySelector('select[name=rooms]');
+  var guestsSelect = adFormElement.querySelector('select[name=capacity]');
 
   // Активирует/деактивирует форму добавления объявления
   window.setAdFormEnabled = function (enabled) {
@@ -44,10 +48,18 @@
     }
   };
 
-  var handleChangePropertyType = function (event) {
+  var validateRoomsAndGuests = function () {
+    if (roomsSelect.value !== guestsSelect.value) {
+      roomsSelect.setCustomValidity('Количество комнат и гостей должно совпадать');
+    } else {
+      roomsSelect.setCustomValidity('');
+    }
+  };
+
+  var propertyTypeSelectChangeHandler = function (evt) {
     var priceInput = document.getElementById('price');
 
-    var offerType = event.target.value;
+    var offerType = evt.target.value;
     var minPricePerNight = MIN_PRICES_PER_NIGHT[offerType];
 
     if (minPricePerNight !== undefined) {
@@ -56,12 +68,26 @@
     }
   };
 
-  var handleChangeTimeIn = function (event) {
-    window.setSelectValue('timein', event.target.value);
-    window.setSelectValue('timeout', event.target.value);
+  var timeInSelectChangeHandler = function (evt) {
+    window.setSelectValue('timeout', evt.target.value);
   };
 
-  typeSelectElement.addEventListener('change', handleChangePropertyType);
-  timeinSelectElement.addEventListener('change', handleChangeTimeIn);
+  var timeOutSelectChangeHandler = function (evt) {
+    window.setSelectValue('timein', evt.target.value);
+  };
+
+  var roomsSelectChangeHandler = function () {
+    validateRoomsAndGuests();
+  };
+
+  var guestsSelectChangeHandler = function () {
+    validateRoomsAndGuests();
+  };
+
+  propertyTypeSelect.addEventListener('change', propertyTypeSelectChangeHandler);
+  timeinSelect.addEventListener('change', timeInSelectChangeHandler);
+  timeoutSelect.addEventListener('change', timeOutSelectChangeHandler);
+  roomsSelect.addEventListener('change', roomsSelectChangeHandler);
+  guestsSelect.addEventListener('change', guestsSelectChangeHandler);
 })();
 // конец

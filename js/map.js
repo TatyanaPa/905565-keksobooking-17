@@ -18,8 +18,8 @@
     type: 'any'
   };
 
-  var handleChangeHousingTypeFilter = function (event) {
-    announcementFilters.type = event.target.value;
+  var handleChangeHousingTypeFilter = function (evt) {
+    announcementFilters.type = evt.target.value;
     filteredAnnouncements = applyFilters();
     renderMapPins(filteredAnnouncements);
   };
@@ -75,8 +75,8 @@
         renderAnnouncementCard(filteredAnnouncements[id]);
       };
 
-      pin.addEventListener('click', function (event) {
-        handleClickMapPin(event.currentTarget.dataset.id);
+      pin.addEventListener('click', function (evt) {
+        handleClickMapPin(evt.currentTarget.dataset.id);
       });
 
       fragment.appendChild(pin);
@@ -170,8 +170,8 @@
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  var handlePressEscapeOnAnnouncementCard = function (event) {
-    if (event.keyCode === 27) {
+  var handlePressEscapeOnAnnouncementCard = function (evt) {
+    if (evt.keyCode === 27) {
       hideAnnouncementCard();
     }
   };
