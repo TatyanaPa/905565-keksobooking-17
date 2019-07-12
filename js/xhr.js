@@ -3,52 +3,38 @@
 (function () {
   var mainElement = document.querySelector('main');
 
+  var createXMLHttpRequest = function (onSuccess, onError) {
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.timeout = 10000;
+
+    xhr.addEventListener('load', function () {
+      if (xhr.status === 200) {
+        onSuccess(xhr.response);
+      } else {
+        onError('Cтатус ответа: ' + xhr.status + ' ' + xhr.statusText);
+      }
+    });
+
+    xhr.addEventListener('error', function () {
+      onError('Произошла ошибка соединения');
+    });
+
+    xhr.addEventListener('timeout', function () {
+      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
+    });
+
+    return xhr;
+  };
+
   window.xhr = {
     load: function (url, onSuccess, onError) {
-      var xhr = new XMLHttpRequest();
-      xhr.responseType = 'json';
-      xhr.timeout = 10000;
-
-      xhr.addEventListener('load', function () {
-        if (xhr.status === 200) {
-          onSuccess(xhr.response);
-        } else {
-          onError('Cтатус ответа: ' + xhr.status + ' ' + xhr.statusText);
-        }
-      });
-
-      xhr.addEventListener('error', function () {
-        onError('Произошла ошибка соединения');
-      });
-
-      xhr.addEventListener('timeout', function () {
-        onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
-      });
-
+      var xhr = createXMLHttpRequest(onSuccess, onError);
       xhr.open('GET', url);
       xhr.send();
     },
     send: function (url, body, onSuccess, onError) {
-      var xhr = new XMLHttpRequest();
-      xhr.responseType = 'json';
-      xhr.timeout = 10000;
-
-      xhr.addEventListener('load', function () {
-        if (xhr.status === 200) {
-          onSuccess(xhr.response);
-        } else {
-          onError('Cтатус ответа: ' + xhr.status + ' ' + xhr.statusText);
-        }
-      });
-
-      xhr.addEventListener('error', function () {
-        onError('Произошла ошибка соединения');
-      });
-
-      xhr.addEventListener('timeout', function () {
-        onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
-      });
-
+      var xhr = createXMLHttpRequest(onSuccess, onError);
       xhr.open('POST', url);
       xhr.send(body);
     },
@@ -57,8 +43,6 @@
       var errorElement = errorTemplate.cloneNode(true);
       var errorMessageElement = errorElement.querySelector('.error__message');
       var errorRetryButton = errorElement.querySelector('.error__button');
-
-      errorMessageElement.textContent = message;
 
       var closeErrorMessage = function () {
         mainElement.removeChild(errorElement);
@@ -77,15 +61,18 @@
 
       var errorRetryButtonClickHandler = function (evt) {
         evt.stopPropagation();
+
         if (onRetry && typeof onRetry === 'function') {
           closeErrorMessage();
           onRetry();
         }
       };
 
+      document.addEventListener('keydown', errorKeyDownHandler);
       errorElement.addEventListener('click', errorClickHandler);
       errorRetryButton.addEventListener('click', errorRetryButtonClickHandler);
-      document.addEventListener('keydown', errorKeyDownHandler);
+
+      errorMessageElement.textContent = message;
 
       mainElement.appendChild(errorElement);
     },
@@ -93,8 +80,6 @@
       var successTemplate = document.querySelector('#success').content.querySelector('.success');
       var successElement = successTemplate.cloneNode(true);
       var successMessageElement = successElement.querySelector('.success__message');
-
-      successMessageElement.textContent = message;
 
       var closeSuccessMessage = function () {
         mainElement.removeChild(successElement);
@@ -111,8 +96,10 @@
         }
       };
 
-      successElement.addEventListener('click', successClickHandler);
       document.addEventListener('keydown', successKeyDownHandler);
+      successElement.addEventListener('click', successClickHandler);
+
+      successMessageElement.textContent = message;
 
       mainElement.appendChild(successElement);
     }
