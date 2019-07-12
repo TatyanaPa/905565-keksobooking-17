@@ -23,10 +23,6 @@
     return 'img/avatars/user' + expandedIndex + '.png';
   };
 
-  window.loadAnnouncements = function (onSuccess, onError) {
-    window.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
-  };
-
   window.getPropertyNameByType = function (type) {
     switch (type) {
       case 'palace':

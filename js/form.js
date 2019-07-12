@@ -77,11 +77,26 @@
   };
 
   var roomsSelectChangeHandler = function () {
-    validateRoomsAndGuests();
+    // validateRoomsAndGuests();
   };
 
   var guestsSelectChangeHandler = function () {
-    validateRoomsAndGuests();
+    // validateRoomsAndGuests();
+  };
+
+  var adFormSubmitHandler = function (evt) {
+    evt.preventDefault();
+
+    var onSuccess = function () {
+      window.xhr.showSuccessMessage('Ваше объявление успешно размещено!');
+    };
+
+    var onError = function () {
+      window.xhr.showErrorMessage('Ошибка отправки формы', adFormSubmitHandler);
+    };
+
+    var formData = new FormData(adFormElement);
+    window.xhr.send('https://js.dump.academy/keksobooking', formData, onSuccess, onError);
   };
 
   propertyTypeSelect.addEventListener('change', propertyTypeSelectChangeHandler);
@@ -89,5 +104,6 @@
   timeoutSelect.addEventListener('change', timeOutSelectChangeHandler);
   roomsSelect.addEventListener('change', roomsSelectChangeHandler);
   guestsSelect.addEventListener('change', guestsSelectChangeHandler);
+  adFormElement.addEventListener('submit', adFormSubmitHandler);
 })();
 // конец

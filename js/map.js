@@ -86,33 +86,17 @@
   };
 
   var loadAnnouncements = function () {
-    window.loadAnnouncements(
-        function (data) {
-          announcements = data;
-          filteredAnnouncements = applyFilters();
-          renderMapPins(filteredAnnouncements);
-        },
-        function (error) {
-          renderLoadAnnouncementsError(error);
-        }
-    );
-  };
+    var onSuccess = function (response) {
+      announcements = response;
+      filteredAnnouncements = applyFilters();
+      renderMapPins(filteredAnnouncements);
+    };
 
-  var renderLoadAnnouncementsError = function (error) {
-    var errorTemplate = document.querySelector('#error').content.querySelector('.error');
-    var errorElement = errorTemplate.cloneNode(true);
-    var errorElementText = errorElement.querySelector('.error__message');
-    var errorElementButton = errorElement.querySelector('.error__button');
+    var onError = function () {
+      window.xhr.showErrorMessage('Ошибка загрузки объявления', loadAnnouncements);
+    };
 
-    errorElementText.innerText = error;
-
-    var mainElement = document.querySelector('main');
-    mainElement.appendChild(errorElement);
-
-    errorElementButton.addEventListener('click', function () {
-      mainElement.removeChild(errorElement);
-      loadAnnouncements();
-    });
+    window.xhr.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
   };
 
   var handleMouseDownMainPin = function (mouseDownEvent) {
@@ -203,22 +187,22 @@
     cardAvatarElement.src = author.avatar;
 
     var cardTitleElement = cardElement.querySelector('.popup__title');
-    cardTitleElement.innerText = offer.title;
+    cardTitleElement.textContent = offer.title;
 
     var cardAddressElement = cardElement.querySelector('.popup__text--address');
-    cardAddressElement.innerText = offer.address;
+    cardAddressElement.textContent = offer.address;
 
     var cardPriceElement = cardElement.querySelector('.popup__text--price');
-    cardPriceElement.innerText = offer.price + '₽/ночь';
+    cardPriceElement.textContent = offer.price + '₽/ночь';
 
     var cardTypeElement = cardElement.querySelector('.popup__type');
-    cardTypeElement.innerText = window.getPropertyNameByType(offer.type);
+    cardTypeElement.textContent = window.getPropertyNameByType(offer.type);
 
     var cardCapacityElement = cardElement.querySelector('.popup__text--capacity');
-    cardCapacityElement.innerText = window.getPropertyCapacity(offer.rooms, offer.guests);
+    cardCapacityElement.textContent = window.getPropertyCapacity(offer.rooms, offer.guests);
 
     var cardTimeInTimeOutElement = cardElement.querySelector('.popup__text--time');
-    cardTimeInTimeOutElement.innerText = window.getPropertyTimeInTimeOut(offer.checkin, offer.checkout);
+    cardTimeInTimeOutElement.textContent = window.getPropertyTimeInTimeOut(offer.checkin, offer.checkout);
 
     var cardFeatureElements = cardElement.querySelectorAll('.popup__feature');
     cardFeatureElements.forEach(function (featureElement) {
@@ -250,7 +234,7 @@
     }
 
     var cardDescriptionElement = cardElement.querySelector('.popup__description');
-    cardDescriptionElement.innerText = offer.description;
+    cardDescriptionElement.textContent = offer.description;
 
     mapElement.appendChild(cardElement);
   };
