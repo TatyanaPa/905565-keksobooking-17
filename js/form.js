@@ -84,7 +84,9 @@
   };
 
   var formSubmitHandler = function (evt) {
-    evt.preventDefault();
+    if (evt) {
+      evt.preventDefault();
+    }
 
     var formData = new FormData(formElement);
 
