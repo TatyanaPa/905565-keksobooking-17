@@ -64,3 +64,4 @@
   typeSelectElement.addEventListener('change', handleChangePropertyType);
   timeinSelectElement.addEventListener('change', handleChangeTimeIn);
 })();
+// конец
