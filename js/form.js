@@ -8,56 +8,71 @@
     palace: 10000
   };
 
-  var adFormElement = document.querySelector('.ad-form');
+  var formElement = document.querySelector('.ad-form');
+  var typeSelect = formElement.querySelector('select[name=type]');
+  var timeinSelect = formElement.querySelector('select[name=timein]');
+  var timeoutSelect = formElement.querySelector('select[name=timeout]');
+  var roomsSelect = formElement.querySelector('select[name=rooms]');
+  var guestsSelect = formElement.querySelector('select[name=capacity]');
 
-  var propertyTypeSelect = adFormElement.querySelector('select[name=type]');
-  var timeinSelect = adFormElement.querySelector('select[name=timein]');
-  var timeoutSelect = adFormElement.querySelector('select[name=timeout]');
-  var roomsSelect = adFormElement.querySelector('select[name=rooms]');
-  var guestsSelect = adFormElement.querySelector('select[name=capacity]');
+  window.form = {
+    // Активирует/деактивирует форму добавления объявления
+    setEnabled: function (enabled) {
+      if (enabled) {
+        formElement.classList.remove('ad-form--disabled');
+      } else {
+        resetForm();
+        formElement.classList.add('ad-form--disabled');
+      }
 
-  // Активирует/деактивирует форму добавления объявления
-  window.setAdFormEnabled = function (enabled) {
-    if (enabled) {
-      adFormElement.classList.remove('ad-form--disabled');
-    } else {
-      adFormElement.classList.add('ad-form--disabled');
-    }
-
-    var fieldsets = adFormElement.querySelectorAll('fieldset');
-    for (var i = 0; i < fieldsets.length; i++) {
-      fieldsets[i].disabled = !enabled;
-    }
-  };
-
-  // Устанавливает значение поля
-  window.setInputValue = function (name, value) {
-    var input = adFormElement.querySelector('input[name=' + name + ']');
-    input.value = value;
-  };
-
-  // Изменяет значение выпадающего меню (select)
-  window.setSelectValue = function (name, value) {
-    var select = adFormElement.querySelector('select[name=' + name + ']');
-    var selectOptions = select.options;
-    for (var i = 0; i < selectOptions.length; i++) {
-      if (selectOptions[i].value === value) {
-        selectOptions[i].selected = true;
-        return;
+      var fieldsets = formElement.querySelectorAll('fieldset');
+      for (var i = 0; i < fieldsets.length; i++) {
+        fieldsets[i].disabled = !enabled;
+      }
+    },
+    // Устанавливает значение поля
+    setInputValue: function (name, value) {
+      var input = formElement.querySelector('input[name=' + name + ']');
+      input.value = value;
+    },
+    // Изменяет значение выпадающего меню
+    setSelectValue: function (name, value) {
+      var select = formElement.querySelector('select[name=' + name + ']');
+      var selectOptions = select.options;
+      for (var i = 0; i < selectOptions.length; i++) {
+        if (selectOptions[i].value === value) {
+          selectOptions[i].selected = true;
+          break;
+        }
       }
     }
+  };
+
+  var resetForm = function () {
+    var selectElements = formElement.querySelectorAll('select');
+    var inputElements = formElement.querySelectorAll('input');
+
+    selectElements.forEach(function (selectElement) {
+      selectElement.selectedIndex = -1;
+    });
+
+    inputElements.forEach(function (inputElement) {
+      inputElement.value = '';
+    });
   };
 
   var validateRoomsAndGuests = function () {
     if (roomsSelect.value !== guestsSelect.value) {
       roomsSelect.setCustomValidity('Количество комнат и гостей должно совпадать');
-    } else {
-      roomsSelect.setCustomValidity('');
+      return false;
     }
+
+    roomsSelect.setCustomValidity('');
+    return true;
   };
 
-  var propertyTypeSelectChangeHandler = function (evt) {
-    var priceInput = document.getElementById('price');
+  var typeSelectChangeHandler = function (evt) {
+    var priceInput = formElement.querySelector('input[name=price]');
 
     var offerType = evt.target.value;
     var minPricePerNight = MIN_PRICES_PER_NIGHT[offerType];
@@ -69,11 +84,11 @@
   };
 
   var timeInSelectChangeHandler = function (evt) {
-    window.setSelectValue('timeout', evt.target.value);
+    window.form.setSelectValue('timeout', evt.target.value);
   };
 
   var timeOutSelectChangeHandler = function (evt) {
-    window.setSelectValue('timein', evt.target.value);
+    window.form.setSelectValue('timein', evt.target.value);
   };
 
   var roomsSelectChangeHandler = function () {
@@ -84,10 +99,35 @@
     validateRoomsAndGuests();
   };
 
-  propertyTypeSelect.addEventListener('change', propertyTypeSelectChangeHandler);
+  var formSubmitHandler = function (evt) {
+    if (evt) {
+      evt.preventDefault();
+    }
+
+    if (!validateRoomsAndGuests()) {
+      return;
+    }
+
+    window.form.setEnabled(false);
+    window.map.setEnabled(false);
+
+    var formData = new FormData(formElement);
+
+    var onSuccess = function () {
+      window.xhr.showSuccessMessage('Ваше объявление успешно размещено!');
+    };
+
+    var onError = function () {
+      window.xhr.showErrorMessage('Ошибка отправки формы', formSubmitHandler);
+    };
+
+    window.xhr.send('https://js.dump.academy/keksobooking', formData, onSuccess, onError);
+  };
+
+  typeSelect.addEventListener('change', typeSelectChangeHandler);
   timeinSelect.addEventListener('change', timeInSelectChangeHandler);
   timeoutSelect.addEventListener('change', timeOutSelectChangeHandler);
   roomsSelect.addEventListener('change', roomsSelectChangeHandler);
   guestsSelect.addEventListener('change', guestsSelectChangeHandler);
+  formElement.addEventListener('submit', formSubmitHandler);
 })();
-// конец
