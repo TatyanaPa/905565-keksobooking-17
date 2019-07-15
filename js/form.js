@@ -21,7 +21,22 @@
       if (enabled) {
         formElement.classList.remove('ad-form--disabled');
       } else {
-        resetForm();
+        var selectElements = formElement.querySelectorAll('select');
+        var inputElements = formElement.querySelectorAll('input[type=text],input[type=number]');
+        var checkboxElements = formElement.querySelectorAll('input[type=checkbox]');
+
+        selectElements.forEach(function (selectElement) {
+          selectElement.selectedIndex = -1;
+        });
+
+        inputElements.forEach(function (inputElement) {
+          inputElement.value = '';
+        });
+
+        checkboxElements.forEach(function (checkboxElement) {
+          checkboxElement.checked = false;
+        });
+
         formElement.classList.add('ad-form--disabled');
       }
 
@@ -46,19 +61,6 @@
         }
       }
     }
-  };
-
-  var resetForm = function () {
-    var selectElements = formElement.querySelectorAll('select');
-    var inputElements = formElement.querySelectorAll('input');
-
-    selectElements.forEach(function (selectElement) {
-      selectElement.selectedIndex = -1;
-    });
-
-    inputElements.forEach(function (inputElement) {
-      inputElement.value = '';
-    });
   };
 
   var validateRoomsAndGuests = function () {
@@ -108,12 +110,11 @@
       return;
     }
 
-    window.form.setEnabled(false);
-    window.map.setEnabled(false);
-
     var formData = new FormData(formElement);
 
     var onSuccess = function () {
+      window.form.setEnabled(false);
+      window.map.setEnabled(false);
       window.xhr.showSuccessMessage('Ваше объявление успешно размещено!');
     };
 

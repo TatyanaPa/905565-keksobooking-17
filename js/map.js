@@ -7,6 +7,11 @@
 
   var mapFilters = mapElement.querySelector('.map__filters');
   var typeFilterSelector = mapFilters.querySelector('select[name=housing-type]');
+  var priceFilterSelector = mapFilters.querySelector('select[name=housing-price]');
+  var roomsFilterSelector = mapFilters.querySelector('select[name=housing-rooms]');
+  var guestsFilterSelector = mapFilters.querySelector('select[name=housing-guests]');
+  var featuresFieldsetElement = mapFilters.querySelector('fieldset#housing-features');
+  var featureFilterElements = mapFilters.querySelectorAll('input[name=features]');
 
   var isMapEnabled = false;
   var initialMainPinCoords = {
@@ -15,10 +20,26 @@
   };
 
   var _ads = [];
-  var filters = {
-    limit: 5,
-    type: 'any'
+
+  var getInitalFilters = function () {
+    return {
+      limit: 5,
+      type: 'any',
+      price: 'any',
+      rooms: 'any',
+      guests: 'any',
+      features: {
+        wifi: false,
+        dishwasher: false,
+        parking: false,
+        washer: false,
+        elevator: false,
+        conditioner: false
+      }
+    };
   };
+
+  var filters = getInitalFilters();
 
   window.map = {
     // Активирует/деактивирует карту
@@ -32,6 +53,7 @@
         mapElement.classList.add('map--faded');
       }
 
+      setFiltersEnabled(enabled);
       isMapEnabled = enabled;
     }
   };
@@ -46,12 +68,72 @@
       });
     }
 
+    // Фильтр по стоимости
+    if (filters.price !== 'any') {
+      filteredAds = filteredAds.filter(function (ad) {
+        switch (filters.price) {
+          case 'middle':
+            return ad.offer.price >= 10000 && ad.offer.price <= 50000;
+          case 'low':
+            return ad.offer.price < 10000;
+          case 'high':
+            return ad.offer.price > 50000;
+          default:
+            return false;
+        }
+      });
+    }
+
+    // Фильтр по количеству комнат
+    if (filters.rooms !== 'any') {
+      filteredAds = filteredAds.filter(function (ad) {
+        return ad.offer.rooms === parseInt(filters.rooms, 10);
+      });
+    }
+
+    // Фильтр по количеству гостей
+    if (filters.guests !== 'any') {
+      filteredAds = filteredAds.filter(function (ad) {
+        return ad.offer.guests === parseInt(filters.guests, 10);
+      });
+    }
+
+    // Фильтр по фичам
+    Object.keys(filters.features).forEach(function (feature) {
+      if (filters.features[feature]) {
+        filteredAds = filteredAds.filter(function (ad) {
+          return ad.offer.features.includes(feature);
+        });
+      }
+    });
+
     // Ограничиваем количество
     if (filters.limit >= 0) {
       filteredAds = filteredAds.slice(0, filters.limit);
     }
 
     return filteredAds;
+  };
+
+  var setFiltersEnabled = function (enabled) {
+    var selectElements = mapFilters.querySelectorAll('select');
+
+    for (var i = 0; i < selectElements.length; i++) {
+      selectElements[i].disabled = !enabled;
+      if (!enabled) {
+        selectElements[i].selectedIndex = 0;
+      }
+    }
+
+    if (!enabled) {
+      featureFilterElements.forEach(function (featureElement) {
+        featureElement.checked = false;
+      });
+    }
+
+    featuresFieldsetElement.disabled = !enabled;
+
+    filters = getInitalFilters();
   };
 
   var clearMapPins = function () {
@@ -165,6 +247,33 @@
     renderMapPins(_ads);
   };
 
+  var priceFilterChangeHandler = function (evt) {
+    filters.price = evt.target.value;
+    renderMapPins(_ads);
+  };
+
+  var roomsFilterChangeHandler = function (evt) {
+    filters.rooms = evt.target.value;
+    renderMapPins(_ads);
+  };
+
+  var guestsFilterChangeHandler = function (evt) {
+    filters.guests = evt.target.value;
+    renderMapPins(_ads);
+  };
+
+  var featureFilterChangeHandler = function (evt) {
+    filters.features[evt.target.value] = evt.target.checked;
+    renderMapPins(_ads);
+  };
+
   mainPinElement.addEventListener('mousedown', mainPinMouseDownHandler);
   typeFilterSelector.addEventListener('change', typeFilterChangeHandler);
+  priceFilterSelector.addEventListener('change', priceFilterChangeHandler);
+  roomsFilterSelector.addEventListener('change', roomsFilterChangeHandler);
+  guestsFilterSelector.addEventListener('change', guestsFilterChangeHandler);
+
+  featureFilterElements.forEach(function (featureFilterElement) {
+    featureFilterElement.addEventListener('change', featureFilterChangeHandler);
+  });
 })();
