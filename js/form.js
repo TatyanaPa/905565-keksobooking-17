@@ -21,6 +21,7 @@
       if (enabled) {
         formElement.classList.remove('ad-form--disabled');
       } else {
+        resetForm();
         formElement.classList.add('ad-form--disabled');
       }
 
@@ -47,12 +48,27 @@
     }
   };
 
+  var resetForm = function () {
+    var selectElements = formElement.querySelectorAll('select');
+    var inputElements = formElement.querySelectorAll('input');
+
+    selectElements.forEach(function (selectElement) {
+      selectElement.selectedIndex = -1;
+    });
+
+    inputElements.forEach(function (inputElement) {
+      inputElement.value = '';
+    });
+  };
+
   var validateRoomsAndGuests = function () {
     if (roomsSelect.value !== guestsSelect.value) {
       roomsSelect.setCustomValidity('Количество комнат и гостей должно совпадать');
-    } else {
-      roomsSelect.setCustomValidity('');
+      return false;
     }
+
+    roomsSelect.setCustomValidity('');
+    return true;
   };
 
   var typeSelectChangeHandler = function (evt) {
@@ -87,6 +103,13 @@
     if (evt) {
       evt.preventDefault();
     }
+
+    if (!validateRoomsAndGuests()) {
+      return;
+    }
+
+    window.form.setEnabled(false);
+    window.map.setEnabled(false);
 
     var formData = new FormData(formElement);
 

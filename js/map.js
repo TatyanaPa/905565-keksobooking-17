@@ -9,6 +9,10 @@
   var typeFilterSelector = mapFilters.querySelector('select[name=housing-type]');
 
   var isMapEnabled = false;
+  var initialMainPinCoords = {
+    x: mainPinElement.style.left,
+    y: mainPinElement.style.top
+  };
 
   var _ads = [];
   var filters = {
@@ -22,6 +26,9 @@
       if (enabled) {
         mapElement.classList.remove('map--faded');
       } else {
+        clearMapPins();
+        resetMainPin();
+        window.card.hide();
         mapElement.classList.add('map--faded');
       }
 
@@ -93,10 +100,18 @@
     window.xhr.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
   };
 
+  var resetMainPin = function () {
+    mainPinElement.style.left = initialMainPinCoords.x;
+    mainPinElement.style.top = initialMainPinCoords.y;
+
+    updateMainPinAddress();
+  };
+
   var updateMainPinAddress = function () {
     var mainPinX = parseInt(mainPinElement.style.left, 10).toString();
     var mainPinY = parseInt(mainPinElement.style.top, 10).toString();
     var mainPinAddress = mainPinX + ', ' + mainPinY;
+
     window.form.setInputValue('address', mainPinAddress);
   };
 
