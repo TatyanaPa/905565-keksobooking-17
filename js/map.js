@@ -48,13 +48,19 @@
         mapElement.classList.remove('map--faded');
       } else {
         clearMapPins();
-        resetMainPin();
+        window.map.resetMainPin();
         window.card.hide();
         mapElement.classList.add('map--faded');
       }
 
       setFiltersEnabled(enabled);
       isMapEnabled = enabled;
+    },
+    resetMainPin: function () {
+      mainPinElement.style.left = initialMainPinCoords.x;
+      mainPinElement.style.top = initialMainPinCoords.y;
+
+      updateMainPinAddress();
     }
   };
 
@@ -180,13 +186,6 @@
     };
 
     window.xhr.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
-  };
-
-  var resetMainPin = function () {
-    mainPinElement.style.left = initialMainPinCoords.x;
-    mainPinElement.style.top = initialMainPinCoords.y;
-
-    updateMainPinAddress();
   };
 
   var updateMainPinAddress = function () {

@@ -9,11 +9,20 @@
   };
 
   var formElement = document.querySelector('.ad-form');
-  var typeSelect = formElement.querySelector('select[name=type]');
-  var timeinSelect = formElement.querySelector('select[name=timein]');
-  var timeoutSelect = formElement.querySelector('select[name=timeout]');
-  var roomsSelect = formElement.querySelector('select[name=rooms]');
-  var guestsSelect = formElement.querySelector('select[name=capacity]');
+
+  var avatarInputElement = formElement.querySelector('input[name=avatar]');
+  var avatarPreviewElement = formElement.querySelector('.ad-form-header__preview > img');
+
+  var typeSelectElement = formElement.querySelector('select[name=type]');
+  var timeinSelectElement = formElement.querySelector('select[name=timein]');
+  var timeoutSelectElement = formElement.querySelector('select[name=timeout]');
+  var roomsSelectElement = formElement.querySelector('select[name=rooms]');
+  var guestsSelectElement = formElement.querySelector('select[name=capacity]');
+
+  var imagesInputElement = formElement.querySelector('input[name=images]');
+  var photoContainerElement = formElement.querySelector('.ad-form__photo-container');
+
+  var resetButtonElement = formElement.querySelector('.ad-form__reset');
 
   window.form = {
     // Активирует/деактивирует форму добавления объявления
@@ -21,22 +30,7 @@
       if (enabled) {
         formElement.classList.remove('ad-form--disabled');
       } else {
-        var selectElements = formElement.querySelectorAll('select');
-        var inputElements = formElement.querySelectorAll('input[type=text],input[type=number]');
-        var checkboxElements = formElement.querySelectorAll('input[type=checkbox]');
-
-        selectElements.forEach(function (selectElement) {
-          selectElement.selectedIndex = -1;
-        });
-
-        inputElements.forEach(function (inputElement) {
-          inputElement.value = '';
-        });
-
-        checkboxElements.forEach(function (checkboxElement) {
-          checkboxElement.checked = false;
-        });
-
+        resetForm();
         formElement.classList.add('ad-form--disabled');
       }
 
@@ -63,14 +57,83 @@
     }
   };
 
+  var resetForm = function () {
+    var selectElements = formElement.querySelectorAll('select');
+    var inputElements = formElement.querySelectorAll('input[type=text],input[type=number]');
+    var checkboxElements = formElement.querySelectorAll('input[type=checkbox]');
+    var imageElements = formElement.querySelectorAll('.ad-form__photo');
+
+    avatarPreviewElement.src = 'img/muffin-grey.svg';
+
+    selectElements.forEach(function (selectElement) {
+      selectElement.selectedIndex = -1;
+    });
+
+    inputElements.forEach(function (inputElement) {
+      inputElement.value = '';
+    });
+
+    checkboxElements.forEach(function (checkboxElement) {
+      checkboxElement.checked = false;
+    });
+
+    imageElements.forEach(function (imageElement) {
+      photoContainerElement.removeChild(imageElement);
+    });
+
+    window.map.resetMainPin();
+  };
+
   var validateRoomsAndGuests = function () {
-    if (roomsSelect.value !== guestsSelect.value) {
-      roomsSelect.setCustomValidity('Количество комнат и гостей должно совпадать');
+    if (roomsSelectElement.value !== guestsSelectElement.value) {
+      roomsSelectElement.setCustomValidity('Количество комнат и гостей должно совпадать');
       return false;
     }
 
-    roomsSelect.setCustomValidity('');
+    roomsSelectElement.setCustomValidity('');
     return true;
+  };
+
+  var avatarSelectHandler = function () {
+    var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+
+    var file = avatarInputElement.files[0];
+    var fileName = file.name.toLowerCase();
+
+    var matches = FILE_TYPES.some(function (type) {
+      return fileName.endsWith(type);
+    });
+
+    if (matches) {
+      var reader = new FileReader();
+
+      reader.addEventListener('load', function () {
+        avatarPreviewElement.src = reader.result;
+      });
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+  var imagesSelectHandler = function () {
+    var files = imagesInputElement.files;
+    if (!files || !files.length) {
+      return;
+    }
+
+    for (var i = 0; i < files.length; i++) {
+      var reader = new FileReader();
+
+      reader.addEventListener('load', function (evt) {
+        var image = document.createElement('img');
+        image.classList.add('ad-form__photo');
+        image.src = evt.target.result;
+
+        photoContainerElement.appendChild(image);
+      });
+
+      reader.readAsDataURL(files[i]);
+    }
   };
 
   var typeSelectChangeHandler = function (evt) {
@@ -101,6 +164,10 @@
     validateRoomsAndGuests();
   };
 
+  var formResetHandler = function () {
+    resetForm();
+  };
+
   var formSubmitHandler = function (evt) {
     if (evt) {
       evt.preventDefault();
@@ -125,10 +192,13 @@
     window.xhr.send('https://js.dump.academy/keksobooking', formData, onSuccess, onError);
   };
 
-  typeSelect.addEventListener('change', typeSelectChangeHandler);
-  timeinSelect.addEventListener('change', timeInSelectChangeHandler);
-  timeoutSelect.addEventListener('change', timeOutSelectChangeHandler);
-  roomsSelect.addEventListener('change', roomsSelectChangeHandler);
-  guestsSelect.addEventListener('change', guestsSelectChangeHandler);
+  avatarInputElement.addEventListener('change', avatarSelectHandler);
+  typeSelectElement.addEventListener('change', typeSelectChangeHandler);
+  timeinSelectElement.addEventListener('change', timeInSelectChangeHandler);
+  timeoutSelectElement.addEventListener('change', timeOutSelectChangeHandler);
+  roomsSelectElement.addEventListener('change', roomsSelectChangeHandler);
+  guestsSelectElement.addEventListener('change', guestsSelectChangeHandler);
+  resetButtonElement.addEventListener('click', formResetHandler);
+  imagesInputElement.addEventListener('change', imagesSelectHandler);
   formElement.addEventListener('submit', formSubmitHandler);
 })();
