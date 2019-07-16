@@ -277,3 +277,5 @@
     featureFilterElement.addEventListener('change', featureFilterChangeHandler);
   });
 })();
+
+// конец
