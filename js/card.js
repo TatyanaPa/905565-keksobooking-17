@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var ESCAPE_KEY_CODE = 27;
+
   var mapElement = document.querySelector('.map');
 
   var getPropertyNameByType = function (type) {
@@ -56,7 +58,10 @@
       cardCapacityElement.textContent = getPropertyCapacity(offer.rooms, offer.guests);
 
       var cardTimeInTimeOutElement = cardElement.querySelector('.popup__text--time');
-      cardTimeInTimeOutElement.textContent = getPropertyTimeInTimeOut(offer.checkin, offer.checkout);
+      cardTimeInTimeOutElement.textContent = getPropertyTimeInTimeOut(
+          offer.checkin,
+          offer.checkout
+      );
 
       var cardFeatureElements = cardElement.querySelectorAll('.popup__feature');
       cardFeatureElements.forEach(function (featureElement) {
@@ -70,28 +75,26 @@
         }
       });
 
-      var cardPhotos = cardElement.querySelector('.popup__photos');
+      var cardPhotosElement = cardElement.querySelector('.popup__photos');
 
-      while (cardPhotos.hasChildNodes()) {
-        cardPhotos.removeChild(cardPhotos.lastChild);
+      while (cardPhotosElement.hasChildNodes()) {
+        cardPhotosElement.removeChild(cardPhotosElement.lastChild);
       }
 
-      for (var i = 0; i < offer.photos.length; i++) {
-        var cardPhoto = document.createElement('img');
-        cardPhoto.classList.add('popup__photo');
-        cardPhoto.width = 45;
-        cardPhoto.height = 40;
-        cardPhoto.src = offer.photos[i];
-        cardPhoto.alt = offer.title;
+      offer.photos.forEach(function (photo) {
+        var cardPhotoElement = document.createElement('img');
+        cardPhotoElement.classList.add('popup__photo');
+        cardPhotoElement.src = photo;
+        cardPhotoElement.alt = offer.title;
 
-        cardPhotos.appendChild(cardPhoto);
-      }
+        cardPhotosElement.appendChild(cardPhotoElement);
+      });
 
       var cardDescriptionElement = cardElement.querySelector('.popup__description');
       cardDescriptionElement.textContent = offer.description;
 
       var cardKeyDownHandler = function (evt) {
-        if (evt.keyCode === 27) {
+        if (evt.keyCode === ESCAPE_KEY_CODE) {
           document.removeEventListener('keypress', cardKeyDownHandler);
           window.card.hide();
         }

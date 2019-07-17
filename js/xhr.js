@@ -1,15 +1,19 @@
 'use strict';
 
 (function () {
+  var TIMEOUT = 10000;
+  var HTTP_SUCCESS_STATUS = 200;
+  var ESCAPE_KEY_CODE = 27;
+
   var mainElement = document.querySelector('main');
 
   var createXMLHttpRequest = function (onSuccess, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-    xhr.timeout = 10000;
+    xhr.timeout = TIMEOUT;
 
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
+      if (xhr.status === HTTP_SUCCESS_STATUS) {
         onSuccess(xhr.response);
       } else {
         onError('Cтатус ответа: ' + xhr.status + ' ' + xhr.statusText);
@@ -53,7 +57,7 @@
       };
 
       var errorKeyDownHandler = function (evt) {
-        if (evt.keyCode === 27) {
+        if (evt.keyCode === ESCAPE_KEY_CODE) {
           document.removeEventListener('keydown', errorKeyDownHandler);
           closeErrorMessage();
         }
@@ -90,7 +94,7 @@
       };
 
       var successKeyDownHandler = function (evt) {
-        if (evt.keyCode === 27) {
+        if (evt.keyCode === ESCAPE_KEY_CODE) {
           document.removeEventListener('keydown', successKeyDownHandler);
           closeSuccessMessage();
         }

@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var MIN_PRICES_PER_NIGHT = {
+  var MinPricesPerNight = {
     bungalo: 0,
     flat: 1000,
     house: 5000,
@@ -34,10 +34,10 @@
         formElement.classList.add('ad-form--disabled');
       }
 
-      var fieldsets = formElement.querySelectorAll('fieldset');
-      for (var i = 0; i < fieldsets.length; i++) {
-        fieldsets[i].disabled = !enabled;
-      }
+      var fieldsetElements = formElement.querySelectorAll('fieldset');
+      fieldsetElements.forEach(function (fieldsetElement) {
+        fieldsetElement.disabled = !enabled;
+      });
     },
     // Устанавливает значение поля
     setInputValue: function (name, value) {
@@ -48,12 +48,12 @@
     setSelectValue: function (name, value) {
       var select = formElement.querySelector('select[name=' + name + ']');
       var selectOptions = select.options;
-      for (var i = 0; i < selectOptions.length; i++) {
-        if (selectOptions[i].value === value) {
-          selectOptions[i].selected = true;
-          break;
+
+      Object.keys(selectOptions).forEach(function (option) {
+        if (selectOptions[option].value === value) {
+          selectOptions[option].selected = true;
         }
-      }
+      });
     }
   };
 
@@ -62,11 +62,12 @@
     var inputElements = formElement.querySelectorAll('input[type=text],input[type=number]');
     var checkboxElements = formElement.querySelectorAll('input[type=checkbox]');
     var imageElements = formElement.querySelectorAll('.ad-form__photo');
+    var descriptionElement = formElement.querySelector('textarea[name=description]');
 
     avatarPreviewElement.src = 'img/muffin-grey.svg';
 
     selectElements.forEach(function (selectElement) {
-      selectElement.selectedIndex = -1;
+      selectElement.selectedIndex = 0;
     });
 
     inputElements.forEach(function (inputElement) {
@@ -81,12 +82,24 @@
       photoContainerElement.removeChild(imageElement);
     });
 
+    descriptionElement.value = '';
+
     window.map.resetMainPin();
   };
 
   var validateRoomsAndGuests = function () {
-    if (roomsSelectElement.value !== guestsSelectElement.value) {
-      roomsSelectElement.setCustomValidity('Количество комнат и гостей должно совпадать');
+    var rooms = roomsSelectElement.value;
+    var guests = guestsSelectElement.value;
+
+    if (rooms === 0 && guests !== 0) {
+      roomsSelectElement.setCustomValidity('Помещение слишком большое для гостей');
+      return false;
+    }
+
+    if (rooms < guests) {
+      roomsSelectElement.setCustomValidity(
+          'Количество комнат должно быть больше или равно количествую гостей'
+      );
       return false;
     }
 
@@ -121,7 +134,7 @@
       return;
     }
 
-    for (var i = 0; i < files.length; i++) {
+    files.forEach(function (file) {
       var reader = new FileReader();
 
       reader.addEventListener('load', function (evt) {
@@ -132,15 +145,15 @@
         photoContainerElement.appendChild(image);
       });
 
-      reader.readAsDataURL(files[i]);
-    }
+      reader.readAsDataURL(file);
+    });
   };
 
   var typeSelectChangeHandler = function (evt) {
     var priceInput = formElement.querySelector('input[name=price]');
 
     var offerType = evt.target.value;
-    var minPricePerNight = MIN_PRICES_PER_NIGHT[offerType];
+    var minPricePerNight = MinPricesPerNight[offerType];
 
     if (minPricePerNight !== undefined) {
       priceInput.min = minPricePerNight;
@@ -165,7 +178,8 @@
   };
 
   var formResetHandler = function () {
-    resetForm();
+    window.map.setEnabled(false);
+    window.form.setEnabled(false);
   };
 
   var formSubmitHandler = function (evt) {
