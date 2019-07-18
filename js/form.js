@@ -1,12 +1,13 @@
 'use strict';
 
 (function () {
-  var MinPricesPerNight = {
-    bungalo: 0,
-    flat: 1000,
-    house: 5000,
-    palace: 10000
-  };
+  var BUNGALO_MIN_PRICE = 0;
+  var FLAT_MIN_PRICE = 1000;
+  var HOUSE_MIN_PRICE = 5000;
+  var PALACE_MIN_PRICE = 10000;
+
+  var NO_GUESTS_OPTION = 0;
+  var MAX_ROOMS_OPTION = 100;
 
   var formElement = document.querySelector('.ad-form');
 
@@ -14,15 +15,14 @@
   var avatarPreviewElement = formElement.querySelector('.ad-form-header__preview > img');
 
   var typeSelectElement = formElement.querySelector('select[name=type]');
+  var priceInputElement = formElement.querySelector('input[name=price]');
   var timeinSelectElement = formElement.querySelector('select[name=timein]');
   var timeoutSelectElement = formElement.querySelector('select[name=timeout]');
   var roomsSelectElement = formElement.querySelector('select[name=rooms]');
   var guestsSelectElement = formElement.querySelector('select[name=capacity]');
 
   var imagesInputElement = formElement.querySelector('input[name=images]');
-  var photoContainerElement = formElement.querySelector('.ad-form__photo-container');
-
-  var resetButtonElement = formElement.querySelector('.ad-form__reset');
+  var photosContainerElement = formElement.querySelector('.ad-form__photo-container');
 
   window.form = {
     // Активирует/деактивирует форму добавления объявления
@@ -41,17 +41,17 @@
     },
     // Устанавливает значение поля
     setInputValue: function (name, value) {
-      var input = formElement.querySelector('input[name=' + name + ']');
-      input.value = value;
+      var inputElement = formElement.querySelector('input[name=' + name + ']');
+      inputElement.value = value;
     },
     // Изменяет значение выпадающего меню
     setSelectValue: function (name, value) {
-      var select = formElement.querySelector('select[name=' + name + ']');
-      var selectOptions = select.options;
+      var selectElement = formElement.querySelector('select[name=' + name + ']');
+      var options = selectElement.options;
 
-      Object.keys(selectOptions).forEach(function (option) {
-        if (selectOptions[option].value === value) {
-          selectOptions[option].selected = true;
+      Object.keys(options).forEach(function (key) {
+        if (options[key].value === value) {
+          options[key].selected = true;
         }
       });
     }
@@ -63,8 +63,6 @@
     var checkboxElements = formElement.querySelectorAll('input[type=checkbox]');
     var imageElements = formElement.querySelectorAll('.ad-form__photo');
     var descriptionElement = formElement.querySelector('textarea[name=description]');
-
-    avatarPreviewElement.src = 'img/muffin-grey.svg';
 
     selectElements.forEach(function (selectElement) {
       selectElement.selectedIndex = 0;
@@ -79,28 +77,52 @@
     });
 
     imageElements.forEach(function (imageElement) {
-      photoContainerElement.removeChild(imageElement);
+      photosContainerElement.removeChild(imageElement);
     });
 
+    avatarPreviewElement.src = 'img/muffin-grey.svg';
+    typeSelectElement.selectedIndex = 1;
+    priceInputElement.placeholder = FLAT_MIN_PRICE;
     descriptionElement.value = '';
 
     window.map.resetMainPin();
   };
 
-  var validateRoomsAndGuests = function () {
-    var rooms = roomsSelectElement.value;
-    var guests = guestsSelectElement.value;
-
-    if (rooms === 0 && guests !== 0) {
-      roomsSelectElement.setCustomValidity('Помещение слишком большое для гостей');
-      return false;
+  var getMinPricePerNight = function (offerType) {
+    switch (offerType) {
+      default:
+      case 'bungalo':
+        return BUNGALO_MIN_PRICE;
+      case 'flat':
+        return FLAT_MIN_PRICE;
+      case 'house':
+        return HOUSE_MIN_PRICE;
+      case 'palace':
+        return PALACE_MIN_PRICE;
     }
+  };
 
-    if (rooms < guests) {
-      roomsSelectElement.setCustomValidity(
-          'Количество комнат должно быть больше или равно количествую гостей'
-      );
-      return false;
+  var validateRoomsAndGuests = function () {
+    var roomsSelectedOption = parseInt(roomsSelectElement.value, window.shared.RADIX_DECIMAL);
+    var guestsSelectedOption = parseInt(guestsSelectElement.value, window.shared.RADIX_DECIMAL);
+
+    if (roomsSelectedOption === MAX_ROOMS_OPTION) {
+      if (guestsSelectedOption !== NO_GUESTS_OPTION) {
+        roomsSelectElement.setCustomValidity('Помещение слишком большое для гостей');
+        return false;
+      }
+    } else {
+      if (guestsSelectedOption === NO_GUESTS_OPTION) {
+        roomsSelectElement.setCustomValidity('Недостаточно комнат');
+        return false;
+      }
+
+      if (roomsSelectedOption < guestsSelectedOption) {
+        roomsSelectElement.setCustomValidity(
+            'Количество комнат должно быть больше или равно количествую гостей'
+        );
+        return false;
+      }
     }
 
     roomsSelectElement.setCustomValidity('');
@@ -108,24 +130,18 @@
   };
 
   var avatarSelectHandler = function () {
-    var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
-
     var file = avatarInputElement.files[0];
-    var fileName = file.name.toLowerCase();
+    if (!file) {
+      return;
+    }
 
-    var matches = FILE_TYPES.some(function (type) {
-      return fileName.endsWith(type);
+    var reader = new FileReader();
+
+    reader.addEventListener('load', function () {
+      avatarPreviewElement.src = reader.result;
     });
 
-    if (matches) {
-      var reader = new FileReader();
-
-      reader.addEventListener('load', function () {
-        avatarPreviewElement.src = reader.result;
-      });
-
-      reader.readAsDataURL(file);
-    }
+    reader.readAsDataURL(file);
   };
 
   var imagesSelectHandler = function () {
@@ -134,31 +150,27 @@
       return;
     }
 
-    files.forEach(function (file) {
+    Object.keys(files).forEach(function (key) {
       var reader = new FileReader();
 
       reader.addEventListener('load', function (evt) {
-        var image = document.createElement('img');
-        image.classList.add('ad-form__photo');
-        image.src = evt.target.result;
+        var imageElement = document.createElement('img');
+        imageElement.classList.add('ad-form__photo');
+        imageElement.src = evt.target.result;
 
-        photoContainerElement.appendChild(image);
+        photosContainerElement.appendChild(imageElement);
       });
 
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(files[key]);
     });
   };
 
   var typeSelectChangeHandler = function (evt) {
-    var priceInput = formElement.querySelector('input[name=price]');
-
     var offerType = evt.target.value;
-    var minPricePerNight = MinPricesPerNight[offerType];
+    var minPricePerNight = getMinPricePerNight(offerType);
 
-    if (minPricePerNight !== undefined) {
-      priceInput.min = minPricePerNight;
-      priceInput.placeholder = minPricePerNight;
-    }
+    priceInputElement.min = minPricePerNight;
+    priceInputElement.placeholder = minPricePerNight;
   };
 
   var timeInSelectChangeHandler = function (evt) {
@@ -212,7 +224,7 @@
   timeoutSelectElement.addEventListener('change', timeOutSelectChangeHandler);
   roomsSelectElement.addEventListener('change', roomsSelectChangeHandler);
   guestsSelectElement.addEventListener('change', guestsSelectChangeHandler);
-  resetButtonElement.addEventListener('click', formResetHandler);
   imagesInputElement.addEventListener('change', imagesSelectHandler);
+  formElement.addEventListener('reset', formResetHandler);
   formElement.addEventListener('submit', formSubmitHandler);
 })();

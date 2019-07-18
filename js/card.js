@@ -1,8 +1,6 @@
 'use strict';
 
 (function () {
-  var ESCAPE_KEY_CODE = 27;
-
   var mapElement = document.querySelector('.map');
 
   var getPropertyNameByType = function (type) {
@@ -32,8 +30,8 @@
     show: function (ad) {
       window.card.hide();
 
-      var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
-      var cardElement = cardTemplate.cloneNode(true);
+      var cardTemplateElement = document.querySelector('#card').content.querySelector('.map__card');
+      var cardElement = cardTemplateElement.cloneNode(true);
       var cardCloseButtonElement = cardElement.querySelector('.popup__close');
 
       var author = ad.author;
@@ -94,7 +92,7 @@
       cardDescriptionElement.textContent = offer.description;
 
       var cardKeyDownHandler = function (evt) {
-        if (evt.keyCode === ESCAPE_KEY_CODE) {
+        if (evt.keyCode === window.shared.ESCAPE_KEY_CODE) {
           document.removeEventListener('keypress', cardKeyDownHandler);
           window.card.hide();
         }

@@ -3,7 +3,6 @@
 (function () {
   var TIMEOUT = 10000;
   var HTTP_SUCCESS_STATUS = 200;
-  var ESCAPE_KEY_CODE = 27;
 
   var mainElement = document.querySelector('main');
 
@@ -43,10 +42,10 @@
       xhr.send(body);
     },
     showErrorMessage: function (message, onRetry) {
-      var errorTemplate = document.querySelector('#error').content.querySelector('.error');
-      var errorElement = errorTemplate.cloneNode(true);
+      var errorTemplateElement = document.querySelector('#error').content.querySelector('.error');
+      var errorElement = errorTemplateElement.cloneNode(true);
       var errorMessageElement = errorElement.querySelector('.error__message');
-      var errorRetryButton = errorElement.querySelector('.error__button');
+      var errorRetryButtonElement = errorElement.querySelector('.error__button');
 
       var closeErrorMessage = function () {
         mainElement.removeChild(errorElement);
@@ -57,7 +56,7 @@
       };
 
       var errorKeyDownHandler = function (evt) {
-        if (evt.keyCode === ESCAPE_KEY_CODE) {
+        if (evt.keyCode === window.shared.ESCAPE_KEY_CODE) {
           document.removeEventListener('keydown', errorKeyDownHandler);
           closeErrorMessage();
         }
@@ -74,19 +73,24 @@
 
       document.addEventListener('keydown', errorKeyDownHandler);
       errorElement.addEventListener('click', errorClickHandler);
-      errorRetryButton.addEventListener('click', errorRetryButtonClickHandler);
+      errorRetryButtonElement.addEventListener('click', errorRetryButtonClickHandler);
 
       errorMessageElement.textContent = message;
 
       mainElement.appendChild(errorElement);
     },
     showSuccessMessage: function (message) {
-      var successTemplate = document.querySelector('#success').content.querySelector('.success');
-      var successElement = successTemplate.cloneNode(true);
+      var successTemplateElement = document
+        .querySelector('#success')
+        .content.querySelector('.success');
+      var successElement = successTemplateElement.cloneNode(true);
       var successMessageElement = successElement.querySelector('.success__message');
 
       var closeSuccessMessage = function () {
         mainElement.removeChild(successElement);
+
+        document.removeEventListener('keydown', successKeyDownHandler);
+        successElement.removeEventListener('click', successClickHandler);
       };
 
       var successClickHandler = function () {
@@ -94,8 +98,7 @@
       };
 
       var successKeyDownHandler = function (evt) {
-        if (evt.keyCode === ESCAPE_KEY_CODE) {
-          document.removeEventListener('keydown', successKeyDownHandler);
+        if (evt.keyCode === window.shared.ESCAPE_KEY_CODE) {
           closeSuccessMessage();
         }
       };
@@ -109,4 +112,3 @@
     }
   };
 })();
-// конец

@@ -23,6 +23,7 @@
   var featureFilterElements = mapFilterElement.querySelectorAll('input[name=features]');
 
   var isMapEnabled = false;
+
   var initialMainPinCoords = {
     x: mainPinElement.style.left,
     y: mainPinElement.style.top
@@ -65,6 +66,7 @@
       setFiltersEnabled(enabled);
       isMapEnabled = enabled;
     },
+    // Возвращает главную метку в начальную позицию
     resetMainPin: function () {
       mainPinElement.style.left = initialMainPinCoords.x;
       mainPinElement.style.top = initialMainPinCoords.y;
@@ -102,22 +104,22 @@
     // Фильтр по количеству комнат
     if (filters.rooms !== 'any') {
       filteredAds = filteredAds.filter(function (ad) {
-        return ad.offer.rooms === parseInt(filters.rooms, 10);
+        return ad.offer.rooms === parseInt(filters.rooms, window.shared.RADIX_DECIMAL);
       });
     }
 
     // Фильтр по количеству гостей
     if (filters.guests !== 'any') {
       filteredAds = filteredAds.filter(function (ad) {
-        return ad.offer.guests === parseInt(filters.guests, 10);
+        return ad.offer.guests === parseInt(filters.guests, window.shared.RADIX_DECIMAL);
       });
     }
 
     // Фильтр по фичам
-    Object.keys(filters.features).forEach(function (feature) {
-      if (filters.features[feature]) {
+    Object.keys(filters.features).forEach(function (key) {
+      if (filters.features[key]) {
         filteredAds = filteredAds.filter(function (ad) {
-          return ad.offer.features.includes(feature);
+          return ad.offer.features.includes(key);
         });
       }
     });
@@ -135,6 +137,7 @@
 
     selectElements.forEach(function (selectElement) {
       selectElement.disabled = !enabled;
+
       if (!enabled) {
         selectElement.selectedIndex = 0;
       }
@@ -198,8 +201,8 @@
   };
 
   var updateMainPinAddress = function () {
-    var mainPinX = parseInt(mainPinElement.style.left, 10).toString();
-    var mainPinY = parseInt(mainPinElement.style.top, 10).toString();
+    var mainPinX = parseInt(mainPinElement.style.left, window.shared.RADIX_DECIMAL);
+    var mainPinY = parseInt(mainPinElement.style.top, window.shared.RADIX_DECIMAL);
     var mainPinAddress = mainPinX + ', ' + mainPinY;
 
     window.form.setInputValue('address', mainPinAddress);
@@ -235,7 +238,7 @@
       var pinMinX = PIN_WIDTH;
       var pinMaxX = mapWidth - PIN_WIDTH;
 
-      if (nextX <= pinMinX || nextX >= pinMaxX || nextY <= PIN_MIN_Y || nextY >= PIN_MAX_Y) {
+      if (nextX < pinMinX || nextX > pinMaxX || nextY < PIN_MIN_Y || nextY > PIN_MAX_Y) {
         return;
       }
 
@@ -244,8 +247,8 @@
         y: mouseMoveEvent.clientY
       };
 
-      mainPinElement.style.left = mainPinElement.offsetLeft - shift.x + 'px';
-      mainPinElement.style.top = mainPinElement.offsetTop - shift.y + 'px';
+      mainPinElement.style.left = nextX + 'px';
+      mainPinElement.style.top = nextY + 'px';
 
       updateMainPinAddress();
     };
