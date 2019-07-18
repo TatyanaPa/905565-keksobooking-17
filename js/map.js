@@ -2,8 +2,8 @@
 
 (function () {
   var PIN_WIDTH = 40;
-  var PIN_MIN_Y = 130;
-  var PIN_MAX_Y = 630;
+  var MIN_PIN_Y = 130;
+  var MAX_PIN_Y = 630;
 
   var MIDDLE_LOWEST_PRICE = 10000;
   var MIDDLE_HIGHEST_PRICE = 50000;
@@ -21,6 +21,9 @@
   var guestsSelectElement = mapFilterElement.querySelector('select[name=housing-guests]');
   var featuresFieldsetElement = mapFilterElement.querySelector('fieldset#housing-features');
   var featureFilterElements = mapFilterElement.querySelectorAll('input[name=features]');
+
+  var mapWidth = mapElement.clientWidth;
+  var maxPinX = mapWidth - PIN_WIDTH;
 
   var isMapEnabled = false;
 
@@ -208,6 +211,26 @@
     window.form.setInputValue('address', mainPinAddress);
   };
 
+  var limitPinPosition = function (position) {
+    if (position.x < PIN_WIDTH) {
+      position.x = PIN_WIDTH;
+    }
+
+    if (position.x > maxPinX) {
+      position.x = maxPinX;
+    }
+
+    if (position.y < MIN_PIN_Y) {
+      position.y = MIN_PIN_Y;
+    }
+
+    if (position.y > MAX_PIN_Y) {
+      position.y = MAX_PIN_Y;
+    }
+
+    return position;
+  };
+
   var mainPinMouseDownHandler = function (mouseDownEvent) {
     mouseDownEvent.preventDefault();
 
@@ -231,24 +254,20 @@
         y: startCoords.y - mouseMoveEvent.clientY
       };
 
-      var nextX = mainPinElement.offsetLeft - shift.x;
-      var nextY = mainPinElement.offsetTop - shift.y;
+      var nextPosition = {
+        x: mainPinElement.offsetLeft - shift.x,
+        y: mainPinElement.offsetTop - shift.y
+      };
 
-      var mapWidth = mapElement.clientWidth;
-      var pinMinX = PIN_WIDTH;
-      var pinMaxX = mapWidth - PIN_WIDTH;
-
-      if (nextX < pinMinX || nextX > pinMaxX || nextY < PIN_MIN_Y || nextY > PIN_MAX_Y) {
-        return;
-      }
+      nextPosition = limitPinPosition(nextPosition);
 
       startCoords = {
         x: mouseMoveEvent.clientX,
         y: mouseMoveEvent.clientY
       };
 
-      mainPinElement.style.left = nextX + 'px';
-      mainPinElement.style.top = nextY + 'px';
+      mainPinElement.style.left = nextPosition.x + 'px';
+      mainPinElement.style.top = nextPosition.y + 'px';
 
       updateMainPinAddress();
     };
