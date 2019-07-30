@@ -162,5 +162,3 @@
 
   mainPinElement.addEventListener('mousedown', mainPinMouseDownHandler);
 })();
-
-// конец
