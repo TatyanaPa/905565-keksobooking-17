@@ -329,6 +329,7 @@ fieldset {
  */
 
 .map__filters-container {
+  display: none;
   width: 100%;
   background-color: rgba(3, 28, 45, 0.5);
 }

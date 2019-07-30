@@ -85,7 +85,7 @@
     priceInputElement.placeholder = FLAT_MIN_PRICE;
     descriptionElement.value = '';
 
-    window.map.resetMainPin();
+    window.map.setEnabled(false);
   };
 
   var getMinPricePerNight = function (offerType) {
