@@ -189,7 +189,8 @@
     validateRoomsAndGuests();
   };
 
-  var formResetHandler = function () {
+  var formResetHandler = function (evt) {
+    evt.preventDefault();
     window.map.setEnabled(false);
     window.form.setEnabled(false);
   };
