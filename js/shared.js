@@ -19,7 +19,7 @@
       }
 
       for (var i = 0, j = properties.length; i < j; i++) {
-        if (properties[i] === undefined) {
+        if (!properties[i]) {
           return false;
         }
       }
