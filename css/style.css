@@ -999,6 +999,8 @@ fieldset {
  */
 
 .map__card {
+  display: none;
+
   position: absolute;
   z-index: 2;
   top: 150px;

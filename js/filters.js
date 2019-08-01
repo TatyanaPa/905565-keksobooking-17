@@ -49,6 +49,11 @@
     apply: function (ads) {
       var filteredAds = ads.slice();
 
+      // Отсеиваем объявления без поля offer
+      filteredAds = filteredAds.filter(function (ad) {
+        return window.shared.checkPropertiesExistance(ad, ad.offer);
+      });
+
       // Фильтруем по типу жилья
       if (filters.type !== 'any') {
         filteredAds = filteredAds.filter(function (ad) {
